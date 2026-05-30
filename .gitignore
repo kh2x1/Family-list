@@ -1,0 +1,24 @@
+# المتغيرات السرية
+.env
+.env.local
+.env.*.local
+
+# الاعتمادات
+node_modules
+dist
+dist-ssr
+
+# السجلات
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs
+*.log
+
+# أدوات النظام والمحررات
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.local
