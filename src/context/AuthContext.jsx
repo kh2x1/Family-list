@@ -33,19 +33,23 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    // الجلسة الحالية عند الإقلاع
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // الجلسة الحالية عند الإقلاع — نُنهي شاشة التحميل فوراً بمجرد معرفة الجلسة،
+    // ثم نحمّل الملف الشخصي في الخلفية (دون انتظار) حتى لا تعلق الواجهة.
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      await loadProfile(session?.user?.id)
       setLoading(false)
+      loadProfile(session?.user?.id)
     })
 
-    // الاستماع لتغيّرات حالة المصادقة (دخول/خروج/تحديث رمز)
+    // الاستماع لتغيّرات حالة المصادقة (دخول/خروج/تحديث رمز).
+    // مهم: لا نستخدم await داخل هذا الردّ لأن استدعاء استعلام Supabase معه
+    // يسبب قفلاً (deadlock) يُجمّد التطبيق. نؤجّل التحميل عبر setTimeout.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-      await loadProfile(session?.user?.id)
+      setLoading(false)
+      setTimeout(() => loadProfile(session?.user?.id), 0)
     })
 
     return () => subscription.unsubscribe()
