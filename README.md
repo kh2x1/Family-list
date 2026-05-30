@@ -158,6 +158,33 @@ VITE_SUPABASE_ANON_KEY=your-anon-public-key
 > بعد النشر، أضف رابط الموقع المنشور في
 > **Supabase → Authentication → URL Configuration → Site URL / Redirect URLs**.
 
+### النشر على GitHub Pages
+
+الرابط بعد النشر: **https://kh2x1.github.io/Family-list/**
+
+يوجد Workflow جاهز في `.github/workflows/deploy.yml` يبني المشروع وينشره تلقائياً
+عند كل دفعة إلى الفرع. لتفعيله مرة واحدة:
+
+1. **أضف مفاتيح Supabase** كأسرار:
+   افتح **Settings → Secrets and variables → Actions → New repository secret**
+   وأضف:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+
+   > المفتاح `anon` عام وآمن للظهور في كود الواجهة، لكن وضعه كسرّ يبقي الإعداد
+   > منظّماً وسهل التغيير.
+
+2. **فعّل GitHub Pages**:
+   افتح **Settings → Pages → Build and deployment → Source** واختر
+   **GitHub Actions**.
+
+3. **شغّل النشر**: ادفع أي تغيير إلى الفرع، أو افتح تبويب **Actions** وشغّل
+   *Deploy to GitHub Pages* يدوياً. بعد اكتمال المهمة سيظهر الرابط أعلاه.
+
+> ملاحظة: مسار `base` مضبوط على `/Family-list/` في `vite.config.js` ليطابق اسم
+> المستودع على GitHub Pages. إن غيّرت اسم المستودع، حدّث هذه القيمة (أو مرّر
+> `VITE_BASE`).
+
 ---
 
 ## 🗃️ مخطط قاعدة البيانات

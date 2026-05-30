@@ -58,7 +58,7 @@ export function useNotifications() {
       try {
         new Notification(title, {
           body,
-          icon: '/cart.svg',
+          icon: `${import.meta.env.BASE_URL}cart.svg`,
           tag: 'family-shopping',
         })
       } catch (e) {
