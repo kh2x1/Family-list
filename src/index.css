@@ -389,6 +389,55 @@ textarea.field__input {
   padding: 1.1rem;
   margin-bottom: 1rem;
 }
+/* ============================================================================
+   التبويبات (القائمة / الأرشيف)
+   ============================================================================ */
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.3rem;
+  margin-bottom: 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-soft);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tab--active {
+  background: var(--primary);
+  color: #fff;
+}
+.tab__icon {
+  font-size: 1.05rem;
+}
+.tab__count {
+  min-width: 22px;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--bg-soft);
+  color: var(--text-soft);
+}
+.tab--active .tab__count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
 .add-form__header {
   display: flex;
   align-items: center;

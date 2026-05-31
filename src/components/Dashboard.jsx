@@ -9,6 +9,7 @@ import Stats from './Stats'
 import AddItemForm from './AddItemForm'
 import Filters from './Filters'
 import ItemList from './ItemList'
+import Tabs from './Tabs'
 
 /**
  * الشاشة الرئيسية بعد تسجيل الدخول.
@@ -22,6 +23,8 @@ export default function Dashboard() {
   const { permission, requestPermission, playSound, showBrowserNotification } =
     useNotifications()
 
+  // العرض الحالي: 'active' (المطلوب) أو 'archive' (تم الشراء + الملغى)
+  const [view, setView] = useState('active')
   // حالة البحث والتصفية والترتيب
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -44,12 +47,29 @@ export default function Dashboard() {
     currentUserId: user?.id,
   })
 
-  // تطبيق البحث + التصفية + الترتيب على العناصر
+  // فصل العناصر: النشطة (مطلوب) مقابل الأرشيف (تم الشراء + الملغى)
+  const activeCount = useMemo(
+    () => items.filter((i) => i.status === 'needed').length,
+    [items]
+  )
+  const archiveCount = useMemo(
+    () => items.filter((i) => i.status === 'purchased' || i.status === 'cancelled').length,
+    [items]
+  )
+
+  // تطبيق العرض (تبويب) + البحث + التصفية + الترتيب على العناصر
   const visibleItems = useMemo(() => {
-    let result = items
-    if (statusFilter !== 'all') {
+    // أولاً نحصر العناصر حسب التبويب الحالي
+    let result =
+      view === 'active'
+        ? items.filter((i) => i.status === 'needed')
+        : items.filter((i) => i.status === 'purchased' || i.status === 'cancelled')
+
+    // التصفية الإضافية حسب الحالة تُطبّق في الأرشيف فقط (تم الشراء/ملغى)
+    if (view === 'archive' && statusFilter !== 'all') {
       result = result.filter((i) => i.status === statusFilter)
     }
+
     const q = search.trim().toLowerCase()
     if (q) {
       result = result.filter((i) => i.item_name.toLowerCase().includes(q))
@@ -60,7 +80,7 @@ export default function Dashboard() {
       return sortOrder === 'newest' ? db - da : da - db
     })
     return result
-  }, [items, search, statusFilter, sortOrder])
+  }, [items, view, search, statusFilter, sortOrder])
 
   // تفعيل إشعارات المتصفح بناءً على طلب المستخدم
   const enableNotifications = useCallback(async () => {
@@ -84,7 +104,15 @@ export default function Dashboard() {
       <main className="container">
         <Stats items={items} />
 
-        <AddItemForm onAdd={addItem} />
+        <Tabs
+          view={view}
+          onChange={setView}
+          activeCount={activeCount}
+          archiveCount={archiveCount}
+        />
+
+        {/* الإضافة متاحة في القائمة النشطة فقط */}
+        {view === 'active' && <AddItemForm onAdd={addItem} />}
 
         <Filters
           search={search}
@@ -93,11 +121,20 @@ export default function Dashboard() {
           onStatusFilter={setStatusFilter}
           sortOrder={sortOrder}
           onSortOrder={setSortOrder}
+          showStatusFilter={view === 'archive'}
         />
 
         <ItemList
           items={visibleItems}
           loading={loading}
+          emptyMessage={
+            view === 'active' ? 'لا توجد أغراض مطلوبة حالياً' : 'الأرشيف فارغ'
+          }
+          emptyHint={
+            view === 'active'
+              ? 'أضف غرضاً جديداً ليظهر هنا'
+              : 'العناصر المشتراة أو الملغاة ستظهر هنا'
+          }
           onUpdate={updateItem}
           onSetStatus={setStatus}
           onDelete={deleteItem}

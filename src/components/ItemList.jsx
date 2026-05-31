@@ -3,7 +3,15 @@ import ItemCard from './ItemCard'
 /**
  * قائمة العناصر — تعرض البطاقات أو حالة فارغة/تحميل.
  */
-export default function ItemList({ items, loading, onUpdate, onSetStatus, onDelete }) {
+export default function ItemList({
+  items,
+  loading,
+  emptyMessage = 'لا توجد عناصر مطابقة',
+  emptyHint = 'أضف غرضاً جديداً ليظهر هنا',
+  onUpdate,
+  onSetStatus,
+  onDelete,
+}) {
   if (loading) {
     return (
       <div className="state state--loading">
@@ -17,8 +25,8 @@ export default function ItemList({ items, loading, onUpdate, onSetStatus, onDele
     return (
       <div className="state state--empty">
         <span className="state__icon">🗒️</span>
-        <p>لا توجد عناصر مطابقة</p>
-        <span className="state__hint">أضف غرضاً جديداً ليظهر هنا</span>
+        <p>{emptyMessage}</p>
+        <span className="state__hint">{emptyHint}</span>
       </div>
     )
   }
