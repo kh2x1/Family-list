@@ -1,0 +1,51 @@
+# بناء التطبيق ودفع مخرجاته (dist) إلى فرع gh-pages
+# لاستخدامه مع: Settings → Pages → Source = Deploy from a branch → gh-pages → / (root)
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - claude/family-shopping-supabase-CzT5d
+  # يسمح بالتشغيل اليدوي من تبويب Actions
+  workflow_dispatch:
+
+# صلاحية الكتابة لازمة لدفع فرع gh-pages
+permissions:
+  contents: write
+
+# نسمح بنشر واحد فقط في كل مرة
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: سحب الكود
+        uses: actions/checkout@v4
+
+      - name: تهيئة Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: تثبيت الاعتمادات
+        run: npm ci
+
+      - name: بناء المشروع
+        env:
+          # تُقرأ من Settings → Secrets and variables → Actions
+          # (المفتاح anon عام وآمن للاستخدام في الواجهة)
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: دفع المخرجات إلى فرع gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
